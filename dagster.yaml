@@ -1,0 +1,34 @@
+# Dagster instance configuration for DeepDarshak pipeline
+# Stores run history, schedules, and sensors metadata in PostgreSQL
+
+storage:
+  postgres:
+    postgres_db:
+      username: dev
+      password: dev
+      hostname: db
+      db_name: deepdarshak_dev
+      port: 5432
+
+run_coordinator:
+  module: dagster.core.run_coordinator
+  class: QueuedRunCoordinator
+
+run_launcher:
+  module: dagster.core.launcher
+  class: DefaultRunLauncher
+
+compute_logs:
+  module: dagster.core.storage.local_compute_log_manager
+  class: LocalComputeLogManager
+  config:
+    base_dir: /opt/dagster/logs
+
+local_artifact_storage:
+  module: dagster.core.storage.root
+  class: LocalArtifactStorage
+  config:
+    base_dir: /opt/dagster/storage
+
+telemetry:
+  enabled: false

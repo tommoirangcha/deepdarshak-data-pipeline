@@ -1,0 +1,39 @@
+# Large data files
+data/AIS_2020_01_01.csv
+*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# DBT
+dbt_project/target/
+dbt_project/logs/
+dbt_project/dbt_packages/
+
+# Dagster
+logs/
+dagster_storage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local

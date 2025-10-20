@@ -1,0 +1,8 @@
+# Dagster workspace configuration (gRPC code location)
+# Points the webserver at the user code process instead of importing code directly.
+
+load_from:
+  - grpc_server:
+      host: dagster-user-code
+      port: 4000
+      location_name: deepdarshak_location

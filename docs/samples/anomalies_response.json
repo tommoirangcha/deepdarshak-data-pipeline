@@ -1,0 +1,15 @@
+{
+  "mmsi": 316005613,
+  "items": [
+    {
+      "event_time": "2020-01-01T00:01:12",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 102.7,
+        "cur_cog": 172.5,
+        "prev_cog": 69.8
+      }
+    }
+  ],
+  "count": 1
+}

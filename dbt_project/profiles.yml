@@ -1,0 +1,14 @@
+# Provides connection details for targets
+# The environment variables needs to be exported in the CLI before starting the DBT
+dbt_project:
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DB_HOST', 'localhost') }}"
+      user: "{{ env_var('DB_USER', 'dev') }}"
+      pass: "{{ env_var('DB_PASS', 'dev') }}"
+      port: "{{ env_var('DB_PORT', '5432') | int }}"
+      dbname: "{{ env_var('DB_NAME', 'deepdarshak_dev') }}"
+      schema: deepdarshak_staging
+      threads: 4
+  target: dev

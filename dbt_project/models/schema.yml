@@ -1,0 +1,160 @@
+#properties
+# models:
+#   # Summary Digital
+#   - name: summary_digital
+#     description: "This table provides a summary of the digital marketing campaigns and its performance metrics."
+#     config:
+#       tags: summary
+#       meta:
+#         dagster:
+#           group: summary_digital
+#   - name: summary_digital_adset
+#     description: "This table provides a summary of the digital adset and its performance metrics."
+#     config:
+#       tags: summary
+#       meta:
+#         dagster:
+#           group: summary_digital
+          
+version: 2
+
+models:
+#   - name: my_first_dbt_model
+#     description: "A starter dbt model"
+#     columns:
+#       - name: id
+#         description: "The primary key for this table"
+#         data_tests:
+#           - unique
+#           - not_null
+
+#   - name: my_second_dbt_model
+#     description: "A starter dbt model"
+#     columns:
+#       - name: id
+#         description: "The primary key for this table"
+#         data_tests:
+#           - unique
+#           - not_null
+
+
+  # Cleaned AIS Data   
+  - name: stg_ais_cleaned
+    description: "Cleaned AIS data with standardized column names, data types, and basic validations."
+    config:
+      tags: ais_cleaning
+      meta:
+        dagster:
+          group: AIS_analysis
+    columns:
+      - name: mmsi
+        description: "Maritime Mobile Service Identity (9-digit identifier)"
+      - name: basedatetime
+        description: "Timestamp of AIS message transmission"
+      - name: lat
+        description: "Latitude in decimal degrees"
+      - name: lon
+        description: "Longitude in decimal degrees"
+      - name: sog
+        description: "Speed Over Ground in knots"
+      - name: cog
+        description: "Course Over Ground in degrees"
+      - name: heading
+        description: "True heading in degrees (0-511, 511=not available)"
+      - name: vesselname
+        description: "Name of the vessel"
+      - name: imo
+        description: "International Maritime Organization number"
+      - name: callsign
+        description: "Radio call sign"
+      - name: vesseltype
+        description: "AIS vessel and cargo type code"
+      - name: status
+        description: "Navigational status code (0-15)"
+      - name: length
+        description: "Overall length of vessel in meters"
+      - name: width
+        description: "Overall width of vessel in meters"
+      - name: draft
+        description: "Maximum present static draught in meters"
+      - name: cargo
+        description: "Type of cargo or ship type"
+      - name: transceiverclass
+        description: "AIS transceiver class (A or B)"
+  
+  # Anomaly Detection
+  - name: int_anomaly_detection
+    description: "Anomaly events derived from stg_ais_cleaned using three rules: high_speed (>60kn), cog_jump (>90° in 5min), duplicate_mmsi_timestamp."
+    config:
+      tags: anomaly_detection
+      meta:
+        dagster:
+          group: AIS_analysis
+    columns:
+      - name: mmsi
+        description: "Maritime Mobile Service Identity for the anomalous event"
+        tests:
+          - not_null
+      - name: event_time
+        description: "Timestamp when the anomaly occurred (basedatetime from source)"
+        tests:
+          - not_null
+      - name: anomaly_type
+        description: "Type of anomaly detected"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['high_speed', 'cog_jump', 'duplicate_mmsi_timestamp']
+      - name: details
+        description: "JSONB object with anomaly-specific context (e.g., sog, prev_cog, cur_cog, diff, count)"
+      - name: created_at
+        description: "Timestamp when the anomaly record was created"
+    
+  
+  # Vessel Tracks (running per-MMSI track with movement and quality metrics)
+  - name: int_vessel_tracks
+    description: "Correlates AIS positions by MMSI into ordered tracks with distance, derived speed, course change, continuity, and quality scores. Includes convenience anomaly flag."
+    config:
+      tags: vessel_tracks
+      meta:
+        dagster:
+          group: AIS_analysis
+    columns:
+      - name: mmsi
+        description: "Maritime Mobile Service Identity"
+        tests:
+          - not_null
+      - name: position_timestamp
+        description: "Timestamp of the AIS position used for sequencing"
+        tests:
+          - not_null
+      - name: latitude
+        description: "Latitude in decimal degrees"
+      - name: longitude
+        description: "Longitude in decimal degrees"
+      - name: position_point
+        description: "PostGIS point geometry (SRID 4326) for spatial analysis"
+      - name: position_sequence
+        description: "Order of positions per MMSI"
+      - name: distance_km_from_prev
+        description: "Distance in kilometers from previous position (Web Mercator distance)"
+      - name: calculated_speed_knots
+        description: "Derived speed from distance/time between positions (knots)"
+      - name: course_change_degrees
+        description: "Absolute course change between consecutive positions accounting for 360° wrap"
+      - name: speed_difference_knots
+        description: "Absolute difference between reported SOG and calculated speed"
+      - name: track_continuity
+        description: "Continuity bucket based on time gaps"
+        tests:
+          - accepted_values:
+              values: [first_position, data_gap, high_frequency, normal_frequency, low_frequency, daily_report, large_gap]
+      - name: movement_classification
+        description: "Movement state classification derived from calculated speed"
+        tests:
+          - accepted_values:
+              values: [initial, stationary_or_gap, anchored, slow_movement, normal_transit, fast_transit, high_speed, anomalous_speed]
+      - name: position_quality_score
+        description: "Quality score (0-1) reflecting continuity and speed consistency"
+      - name: has_potential_anomaly
+        description: "Convenience boolean flag for quick filtering of suspicious movements"

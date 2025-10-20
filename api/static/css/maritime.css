@@ -1,0 +1,4 @@
+html, body, #map { height: 100%; margin: 0; padding: 0; }
+.container { height: 100vh; display: flex; flex-direction: column; }
+h1 { text-align: center; margin: 8px 0; }
+#map { flex: 1; }

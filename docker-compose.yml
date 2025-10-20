@@ -1,0 +1,158 @@
+services:
+  # -----------------------
+  # PostgreSQL + PostGIS
+  # -----------------------
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: deepdarshak-db
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: deepdarshak_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -----------------------
+  # Dagster User Code Location
+  # -----------------------
+  dagster-user-code:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: dagster-user-code
+    container_name: deepdarshak-dagster-code
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: dev
+      DB_PASS: dev
+      DB_PORT: 5432
+      DB_NAME: deepdarshak_dev
+      DBT_PROFILES_DIR: /app/dbt_project
+      DBT_PROJECT_DIR: /app/dbt_project
+      DBT_TARGET: dev
+    volumes:
+      - ./dagster_project:/app/dagster_project
+      - ./dbt_project:/app/dbt_project
+      - ./data:/app/data
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD-SHELL", "dagster api grpc-health-check -h 127.0.0.1 -p 4000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  # -----------------------
+  # Dagster Webserver (UI)
+  # -----------------------
+  dagster-webserver:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: dagster-web
+    container_name: deepdarshak-dagster-webserver
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      dagster-user-code:
+        condition: service_healthy
+    environment:
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      DAGSTER_POSTGRES_USER: dev
+      DAGSTER_POSTGRES_PASSWORD: dev
+      DAGSTER_POSTGRES_HOST: db
+      DAGSTER_POSTGRES_PORT: 5432
+      DAGSTER_POSTGRES_DB: deepdarshak_dev
+    volumes:
+      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
+      - ./dagster_project:/app/dagster_project
+      - ./dbt_project:/app/dbt_project
+      - dagster_logs:/opt/dagster/logs
+      - dagster_storage:/opt/dagster/storage
+    ports:
+      - "3001:3001"
+    command:
+      - dagster-webserver
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3001"
+      - --workspace
+      - /opt/dagster/dagster_home/workspace.yaml
+
+  # -----------------------
+  # Dagster Daemon (Schedules/Sensors)
+  # -----------------------
+  dagster-daemon:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: dagster-web
+    container_name: deepdarshak-dagster-daemon
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      dagster-user-code:
+        condition: service_healthy
+    environment:
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      DAGSTER_POSTGRES_USER: dev
+      DAGSTER_POSTGRES_PASSWORD: dev
+      DAGSTER_POSTGRES_HOST: db
+      DAGSTER_POSTGRES_PORT: 5432
+      DAGSTER_POSTGRES_DB: deepdarshak_dev
+    volumes:
+      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
+      - ./dagster_project:/app/dagster_project
+      - ./dbt_project:/app/dbt_project
+      - dagster_logs:/opt/dagster/logs
+      - dagster_storage:/opt/dagster/storage
+    command:
+      - dagster-daemon
+      - run
+      - --workspace
+      - /opt/dagster/dagster_home/workspace.yaml
+
+  # -----------------------
+  # FastAPI Service
+  # -----------------------
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: api
+    container_name: deepdarshak-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: dev
+      DB_PASS: dev
+      DB_NAME: deepdarshak_dev
+      API_KEY: "${API_KEY:-deepdarshak_ais_2025}"
+    ports:
+      - "8080:8080"
+volumes:
+  pgdata:
+  dagster_logs:
+  dagster_storage:

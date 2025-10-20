@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: raw_dump
+    description: Raw AIS data from maritime sources
+    schema: deepdarshak_raw_dump
+    tables:
+      - name: raw_vessel_data
+        description: Raw unprocessed AIS data with mixed-case column names
+        columns:
+          - name: MMSI
+            description: Maritime Mobile Service Identity (9-digit identifier)
+          - name: BaseDateTime  
+            description: Timestamp of AIS message transmission
+          - name: LAT
+            description: Latitude in decimal degrees
+          - name: LON
+            description: Longitude in decimal degrees
+          - name: SOG
+            description: Speed Over Ground in knots
+          - name: COG
+            description: Course Over Ground in degrees
+          - name: Heading
+            description: True heading in degrees (0-511, 511=not available)
+          - name: VesselName
+            description: Name of the vessel
+          - name: IMO
+            description: International Maritime Organization number
+          - name: CallSign
+            description: Radio call sign
+          - name: VesselType
+            description: AIS vessel and cargo type code
+          - name: Status
+            description: Navigational status code (0-15)
+          - name: Length
+            description: Overall length of vessel in meters
+          - name: Width
+            description: Overall width of vessel in meters
+          - name: Draft
+            description: Maximum present static draught in meters
+          - name: Cargo
+            description: Type of cargo or ship type
+          - name: TransceiverClass
+            description: AIS transceiver class (A or B)
