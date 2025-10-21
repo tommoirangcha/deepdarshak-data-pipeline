@@ -42,6 +42,8 @@ ingestion_schedule = ScheduleDefinition(
     name="daily_ingestion",
     job=ingestion_job,
     cron_schedule="0 0 * * *",  # midnight UTC every day
+    # cron_schedule="0 6,21 * * *",     # Scheduled cron 2 times a day - (6 AM and 9 PM)
+    # execution_timezone="Asia/Kolkata",
     default_status=DefaultScheduleStatus.RUNNING,
     description="Runs the CSV ingestion asset daily at midnight UTC",
 )

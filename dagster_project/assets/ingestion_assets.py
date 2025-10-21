@@ -72,7 +72,8 @@ def ingest_ais_csv(context: AssetExecutionContext) -> Output:
         # )
         chunk['ingested_at'] = pd.Timestamp.now(tz='UTC')
         
-        # Write to database
+        # write chunk: first chunk replaces table, later chunks append
+        # method='multi' batches inserts for performance when supported
         chunk.to_sql(
             TABLE_NAME,
             engine,
@@ -81,15 +82,19 @@ def ingest_ais_csv(context: AssetExecutionContext) -> Output:
             index=False,
             method='multi'
         )
-        
+
+        # update progress counters
         total_rows += len(chunk)
         chunk_count += 1
-        
+
+        # log progress every 10 chunks
         if chunk_count % 10 == 0:
             context.log.info(f"Processed {chunk_count} chunks ({total_rows} rows)")
-    
+
+    # final summary log
     context.log.info(f"✓ Ingestion complete: {total_rows} rows in {chunk_count} chunks")
-    
+
+    # return a Dagster Output: `value` for downstream use, `metadata` for UI/monitoring
     return Output(
         value={"rows_ingested": total_rows, "chunks_processed": chunk_count},
         metadata={
