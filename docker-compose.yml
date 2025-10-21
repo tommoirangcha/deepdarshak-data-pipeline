@@ -42,6 +42,7 @@ services:
       DBT_PROFILES_DIR: /app/dbt_project
       DBT_PROJECT_DIR: /app/dbt_project
       DBT_TARGET: dev
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
     volumes:
       - ./dagster_project:/app/dagster_project
       - ./dbt_project:/app/dbt_project
@@ -77,6 +78,7 @@ services:
       DAGSTER_POSTGRES_HOST: db
       DAGSTER_POSTGRES_PORT: 5432
       DAGSTER_POSTGRES_DB: deepdarshak_dev
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
     volumes:
       - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
       - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
@@ -117,6 +119,7 @@ services:
       DAGSTER_POSTGRES_HOST: db
       DAGSTER_POSTGRES_PORT: 5432
       DAGSTER_POSTGRES_DB: deepdarshak_dev
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
     volumes:
       - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
       - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
