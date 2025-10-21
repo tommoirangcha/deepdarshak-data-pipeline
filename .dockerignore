@@ -1,0 +1,20 @@
+# Exclude dbt installed packages and artifacts (Windows can error on symlinks)
+dbt_project/dbt_packages/
+dbt_project/dbt_packages/**
+dbt_project/target/
+dbt_project/logs/
+dbt_project/.dbt/
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Git and local env
+.git
+.env
+venv/
+.venv
+
+# Docker and editor files
+Dockerfile
+docker-compose.override.yml

@@ -36,6 +36,7 @@ shapely==2.0.2
 
 # API & Auth
 requests==2.31.0
+slack_sdk==3.27.1
 python-multipart==0.0.6
 
 # Optional: Remove if not needed for DeepDarshak

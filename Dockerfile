@@ -67,12 +67,27 @@ WORKDIR /app
 COPY dagster_project/ /app/dagster_project/
 COPY dbt_project/ /app/dbt_project/
 
-# Install dbt packages (ignore failure to avoid build break in clean envs)
-RUN cd /app/dbt_project && dbt deps || true
+# Also bake a copy of the dbt project with dependencies resolved so we can
+# bootstrap mounted volumes at runtime without running `dbt deps` (which tries
+# to delete the packages directory and fails if it's a mount point).
+COPY dbt_project/ /opt/dbt_baked/dbt_project/
+# Install dbt packages into the baked copy (ignore failures in clean envs)
+RUN cd /opt/dbt_baked/dbt_project && dbt deps || true
 
 EXPOSE 4000
 
 # Ensure dbt manifest exists after bind mount, then start Dagster gRPC
 # - Remove any lock files to avoid incompatible pins (e.g., old dbt_utils)
 # - Clear previous dbt artifacts that may be overwritten by bind mounts
-CMD ["/bin/sh", "-lc", "set -e; cd /app/dbt_project; rm -f packages.lock package-lock.yml; rm -rf dbt_packages target; dbt deps; (dbt parse || dbt compile); exec dagster api grpc --host 0.0.0.0 --port 4000 --module-name dagster_project.definitions --attribute defs"]
+CMD ["/bin/sh", "-lc", "set -e; cd /app/dbt_project; rm -f packages.lock package-lock.yml 2>/dev/null || true; \
+if grep -q ' /app/dbt_project/dbt_packages ' /proc/mounts; then \
+    echo 'Detected mounted dbt_packages; skipping dbt deps and bootstrapping from baked cache if empty'; \
+    mkdir -p dbt_packages; \
+    if [ -z \"$(ls -A dbt_packages 2>/dev/null)\" ]; then \
+        cp -a /opt/dbt_baked/dbt_project/dbt_packages/. dbt_packages/ 2>/dev/null || true; \
+    fi; \
+else \
+    rm -rf dbt_packages target 2>/dev/null || true; \
+    dbt deps; \
+fi; \
+(dbt parse || dbt compile); exec dagster api grpc --host 0.0.0.0 --port 4000 --module-name dagster_project.definitions --attribute defs"]

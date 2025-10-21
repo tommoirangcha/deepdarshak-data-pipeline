@@ -46,6 +46,8 @@ services:
     volumes:
       - ./dagster_project:/app/dagster_project
       - ./dbt_project:/app/dbt_project
+      # Overlay packages dir with an anonymous volume so container manages dbt deps (avoid Windows bind-mount perms)
+      - /app/dbt_project/dbt_packages
       - ./data:/app/data
     ports:
       - "4000:4000"
@@ -84,6 +86,7 @@ services:
       - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
       - ./dagster_project:/app/dagster_project
       - ./dbt_project:/app/dbt_project
+      - /app/dbt_project/dbt_packages
       - dagster_logs:/opt/dagster/logs
       - dagster_storage:/opt/dagster/storage
     ports:
@@ -125,6 +128,7 @@ services:
       - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
       - ./dagster_project:/app/dagster_project
       - ./dbt_project:/app/dbt_project
+      - /app/dbt_project/dbt_packages
       - dagster_logs:/opt/dagster/logs
       - dagster_storage:/opt/dagster/storage
     command:
