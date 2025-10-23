@@ -78,8 +78,7 @@ track_calculations AS (
         -- Calculated speed based on actual movement
         CASE 
             WHEN prev_position_point IS NOT NULL 
-                 AND hours_since_prev_position > 0 
-                 AND hours_since_prev_position <= 24  -- Reasonable time gap
+                 AND hours_since_prev_position > 0 AND hours_since_prev_position <= 24  -- Reasonable time gap
                  AND distance_km_from_prev IS NOT NULL
             THEN
                 (distance_km_from_prev / hours_since_prev_position) * 0.539957  -- km/h to knots
@@ -99,8 +98,7 @@ track_calculations AS (
         CASE 
             WHEN reported_speed_knots IS NOT NULL 
                  AND distance_km_from_prev IS NOT NULL
-                 AND hours_since_prev_position > 0
-                 AND hours_since_prev_position <= 24
+                 AND hours_since_prev_position > 0 AND hours_since_prev_position <= 24
             THEN
                 ABS(reported_speed_knots - ((distance_km_from_prev / hours_since_prev_position) * 0.539957))
             ELSE NULL
