@@ -92,7 +92,21 @@ Sample anomaly response (see `docs/samples/anomalies_response.json`):
 }
 ```
 
-## 3) Screenshot or output of anomaly detection
+## 3) Vessel Path Visualization (Map Preview)
+
+- Visual form: The API provides a ready-to-use HTML map preview of a vessel's path.
+- Endpoint: `/visualizations/vessel/{mmsi}/map-preview` (replace `{mmsi}` with the vessel's 9-digit MMSI).
+- Example usage:
+  - Open in browser: [http://localhost:8080/visualizations/vessel/211000000/map-preview](http://localhost:8080/visualizations/vessel/211000000/map-preview)
+  - Add query params for time window or point limit:
+    `?start=2025-01-01T00:00:00Z&end=2025-01-02T00:00:00Z&max_points=1000`
+- The endpoint returns an interactive map (HTML) showing the vessel's track for the selected period.
+- You can also embed this map in another web page using an `<iframe>`:
+  ```html
+  <iframe src="http://localhost:8080/visualizations/vessel/211000000/map-preview" width="800" height="600"></iframe>
+  ```
+
+## 4) Screenshot or output of anomaly detection
 
 - json Output (API JSON): use `docs/samples/anomalies_response.json` for anomaly API.
 - Screenshot result -  `screenshots/anomalies.png`

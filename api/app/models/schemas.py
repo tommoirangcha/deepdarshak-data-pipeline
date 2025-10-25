@@ -6,7 +6,7 @@ from datetime import datetime
 class VesselSummary(BaseModel):
     mmsi: int
     vesselname: Optional[str] = None
-    imo: Optional[int] = None
+    imo: Optional[str] = None
     callsign: Optional[str] = None
     vesseltype: Optional[int] = None
     length: Optional[float] = None
