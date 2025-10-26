@@ -128,6 +128,9 @@ Or embed:
 <iframe src="http://localhost:8080/visualizations/vessel/211000000/map-preview" width="800" height="600"></iframe>
 ```
 
+# rebuild and restart the container every time you change your API code:
+docker compose up --build -d api
+
 ---
 
 ## Data Model & Anomaly Logic

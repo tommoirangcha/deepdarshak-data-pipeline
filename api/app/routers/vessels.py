@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.engine import Row
 from ..core.deps import require_api_key
 from ..db.session import db_conn
-from ..db.queries import LATEST_VESSEL_SUMMARY, LATEST_POSITION, LIST_ANOMALIES
-from ..models.schemas import VesselSummary, Position, AnomaliesResponse, Anomaly
+from ..db.queries import LATEST_VESSEL_SUMMARY, LATEST_POSITION, LIST_ANOMALIES, COUNT_ANOMALIES
+from ..models.schemas import VesselSummary, Position, AnomaliesResponse, Anomaly, AnomaliesMeta
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -12,6 +12,60 @@ from typing import Optional
 # a GeoJSON positions collection (for mapping), and anomaly listings.
 
 router = APIRouter()
+
+
+@router.get("/anomalies", response_model=AnomaliesResponse)
+def list_all_anomalies(
+    mmsi: Optional[int] = Query(None, description="9-digit MMSI to filter anomalies for a vessel"),
+    limit: int = Query(50, ge=1, le=500),
+    since: Optional[str] = Query(None, description="ISO8601 UTC timestamp to filter anomalies from"),
+    page: int = Query(1, ge=1, description="Page number for pagination"),
+    _api_key: None = Depends(require_api_key),
+):
+    # Validate MMSI if provided
+    if mmsi is not None and not (100000000 <= mmsi <= 999999999):
+        raise HTTPException(status_code=422, detail="mmsi must be a 9-digit integer")
+    
+    # Parse 'since' into datetime
+    parsed_since = None
+    if since is not None:
+        try:
+            if since.endswith('Z'):
+                parsed_since = datetime.fromisoformat(since.replace('Z', '+00:00'))
+            else:
+                parsed_since = datetime.fromisoformat(since)
+            if parsed_since.tzinfo is None:
+                parsed_since = parsed_since.replace(tzinfo=timezone.utc)
+            else:
+                parsed_since = parsed_since.astimezone(timezone.utc)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid 'since' datetime format. Expect ISO8601 UTC string.")
+    
+    # Calculate offset for pagination
+    offset = (page - 1) * limit
+    
+    with db_conn() as conn:
+        # Get total count
+        count_result = conn.execute(
+            COUNT_ANOMALIES, 
+            {"mmsi": mmsi, "since": parsed_since}
+        ).fetchone()
+        total = count_result[0] if count_result else 0
+        
+        # Get paginated data
+        params = {"mmsi": mmsi, "since": parsed_since, "limit": limit, "offset": offset}
+        rows = conn.execute(LIST_ANOMALIES, params).mappings().all()
+        items = [Anomaly(**r) for r in rows]
+        
+        # Build meta object
+        meta = AnomaliesMeta(
+            count=len(items),
+            limit=limit,
+            page=page,
+            total=total
+        )
+        
+        return AnomaliesResponse(data=items, meta=meta)
 
 
 @router.get("/{mmsi}", response_model=VesselSummary)
@@ -103,30 +157,4 @@ def get_positions_geojson(
     # Return a GeoJSON FeatureCollection ready for mapping libraries
     return {"type": "FeatureCollection", "features": features}
 
-
-@router.get("/{mmsi}/anomalies", response_model=AnomaliesResponse)
-def list_anomalies(mmsi: int = Path(..., description="9-digit MMSI", example=211000000), limit: int = Query(50, ge=1, le=500), since: Optional[str] = Query(None, description="ISO8601 UTC timestamp to filter anomalies from"), _api_key: None = Depends(require_api_key)):
-    if not (100000000 <= mmsi <= 999999999):
-        raise HTTPException(status_code=422, detail="mmsi must be a 9-digit integer")
-    # Validate limit range enforced by Query, and parse 'since' into datetime
-    parsed_since = None
-    if since is not None:
-        try:
-            # datetime.fromisoformat doesn't accept a trailing 'Z' for UTC, so handle that
-            if since.endswith('Z'):
-                parsed_since = datetime.fromisoformat(since.replace('Z', '+00:00'))
-            else:
-                parsed_since = datetime.fromisoformat(since)
-            # normalize to timezone-aware UTC if naive
-            if parsed_since.tzinfo is None:
-                parsed_since = parsed_since.replace(tzinfo=timezone.utc)
-            else:
-                parsed_since = parsed_since.astimezone(timezone.utc)
-        except Exception:
-            # Return 400 for invalid since format as requested
-            raise HTTPException(status_code=400, detail="Invalid 'since' datetime format. Expect ISO8601 UTC string.")
-    params = {"mmsi": mmsi, "limit": limit, "since": parsed_since}
-    with db_conn() as conn:
-        rows = conn.execute(LIST_ANOMALIES, params).mappings().all()
-        items = [Anomaly(**r) for r in rows]
-        return AnomaliesResponse(mmsi=mmsi, items=items, count=len(items))
+   

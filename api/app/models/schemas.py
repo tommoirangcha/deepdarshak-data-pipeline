@@ -28,16 +28,23 @@ class Position(BaseModel):
 
 
 class Anomaly(BaseModel):
-    event_time: Optional[datetime] = None
+    mmsi: Optional[int] = None
+    position_timestamp: Optional[datetime] = None
     anomaly_type: Optional[str] = None
     details: Optional[Any] = None
+    created_at: Optional[datetime] = None
+
+
+class AnomaliesMeta(BaseModel):
+    count: int = 0  # Number of items in current response
+    limit: int = 50
+    page: int = 1
+    total: int = 0  # Total number of matching records
 
 
 class AnomaliesResponse(BaseModel):
-    mmsi: int
-    items: List[Anomaly]
-    count: int
-
+    data: List[Anomaly]  # Changed from 'items' to 'data'
+    meta: AnomaliesMeta
 
 class GeoJSONFeature(BaseModel):
     type: str = "Feature"

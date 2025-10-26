@@ -36,15 +36,29 @@ LATEST_POSITION = text(
     LIMIT 1
     """
 )
-
 LIST_ANOMALIES = text(
     """
-    SELECT *
-    FROM deepdarshak_staging.mart_detected_anomalies
-    WHERE mmsi = :mmsi
-      AND (:since IS NULL OR position_timestamp >= :since)
+        SELECT
+                mmsi,
+                position_timestamp,
+                anomaly_type,
+                details,
+                created_at
+        FROM deepdarshak_staging.mart_detected_anomalies
+        WHERE (:mmsi IS NULL OR mmsi = :mmsi)
+            AND (:since IS NULL OR position_timestamp >= :since)
         ORDER BY position_timestamp DESC, created_at DESC
-    LIMIT :limit
+        LIMIT :limit
+        OFFSET :offset
+    """
+)
+
+COUNT_ANOMALIES = text(
+    """
+        SELECT COUNT(*) as total
+        FROM deepdarshak_staging.mart_detected_anomalies
+        WHERE (:mmsi IS NULL OR mmsi = :mmsi)
+            AND (:since IS NULL OR position_timestamp >= :since)
     """
 )
 
