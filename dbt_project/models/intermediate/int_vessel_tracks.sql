@@ -6,7 +6,7 @@
             {'columns': ['mmsi']},
             {'columns': ['position_timestamp']},
             {'columns': ['track_continuity']},
-            {'columns': ['position_point'], 'type': 'gist'}
+            {'columns': ['location_point'], 'type': 'gist'}
         ],
         pre_hook="SET work_mem = '256MB'",
         post_hook=[
@@ -29,37 +29,37 @@ WITH validated_positions AS (
         (flag_reason = '' OR flag_reason IS NULL)
         -- Future: Uncomment for incremental materialization
         -- {% if is_incremental() %}
-        -- AND basedatetime > (
-        --     select coalesce(max(position_timestamp), '1900-01-01'::timestamp)
-        --     from {{ this }}
-        -- )
+    -- AND position_timestamp > (
+    --     select coalesce(max(position_timestamp), '1900-01-01'::timestamp)
+    --     from {{ this }}
+    -- )
         -- {% endif %}
 ),
 vessel_position_sequences AS (
     SELECT 
         mmsi,
-        basedatetime as position_timestamp,
-        lat as latitude,
-        lon as longitude,
-        sog as reported_speed_knots,
-        cog as reported_course_degrees,
+        base_datetime as position_timestamp,
+        lat,
+        lon,
+        sog,
+        cog,
         heading,
-        vesselname as vessel_name,
-        imo as imo_number,
-        vesseltype as vessel_type,
+        vessel_name,
+        imo,
+        vessel_type,
         -- Vessel track sequencing
-        ROW_NUMBER() OVER (PARTITION BY mmsi ORDER BY basedatetime) as position_sequence,
+        ROW_NUMBER() OVER (PARTITION BY mmsi ORDER BY base_datetime) as position_sequence,
         -- Previous position correlation using window functions
-        LAG(basedatetime) OVER (PARTITION BY mmsi ORDER BY basedatetime) as prev_position_timestamp,
-        LAG(lat) OVER (PARTITION BY mmsi  ORDER BY basedatetime) as prev_latitude,
-        LAG(lon) OVER (PARTITION BY mmsi  ORDER BY basedatetime) as prev_longitude,
-        LAG(sog) OVER (PARTITION BY mmsi  ORDER BY basedatetime) as prev_reported_speed_knots,
-        LAG(cog) OVER (PARTITION BY mmsi  ORDER BY basedatetime) as prev_reported_course_degrees,
+        LAG(base_datetime) OVER (PARTITION BY mmsi ORDER BY base_datetime) as prev_position_timestamp,
+        LAG(lat) OVER (PARTITION BY mmsi  ORDER BY base_datetime) as prev_lat,
+        LAG(lon) OVER (PARTITION BY mmsi  ORDER BY base_datetime) as prev_lon,
+        LAG(sog) OVER (PARTITION BY mmsi  ORDER BY base_datetime) as prev_sog,
+        LAG(cog) OVER (PARTITION BY mmsi  ORDER BY base_datetime) as prev_cog,
         -- Time calculations
-        EXTRACT(EPOCH FROM (basedatetime - LAG(basedatetime) OVER (PARTITION BY mmsi ORDER BY basedatetime))) / 3600.0 as hours_since_prev_position,
+        EXTRACT(EPOCH FROM (base_datetime - LAG(base_datetime) OVER (PARTITION BY mmsi ORDER BY base_datetime))) / 3600.0 as hours_since_prev_position,
         -- Spatial reference (SRID 4326 = WGS84 for GPS coordinates)
-        ST_SetSRID(ST_Point(lon, lat), 4326) as position_point,
-        LAG(ST_SetSRID(ST_Point(lon, lat), 4326)) OVER (PARTITION BY mmsi ORDER BY basedatetime) as prev_position_point
+        ST_SetSRID(ST_Point(lon, lat), 4326) as location_point,
+        LAG(ST_SetSRID(ST_Point(lon, lat), 4326)) OVER (PARTITION BY mmsi ORDER BY base_datetime) as prev_location_point
     FROM validated_positions
 ),
 -- Compute distance first so it can be referenced downstream
@@ -67,7 +67,7 @@ distance_calc AS (
     SELECT
         *,
         CASE 
-            WHEN prev_position_point IS NOT NULL THEN ST_Distance(ST_Transform(prev_position_point::geometry, 3857), ST_Transform(position_point::geometry, 3857)) / 1000.0
+            WHEN prev_location_point IS NOT NULL THEN ST_Distance(ST_Transform(prev_location_point::geometry, 3857), ST_Transform(location_point::geometry, 3857)) / 1000.0
             ELSE NULL
         END AS distance_km_from_prev
     FROM vessel_position_sequences
@@ -77,7 +77,7 @@ track_calculations AS (
         *,
         -- Calculated speed based on actual movement
         CASE 
-            WHEN prev_position_point IS NOT NULL 
+          WHEN prev_location_point IS NOT NULL 
                  AND hours_since_prev_position > 0 AND hours_since_prev_position <= 24  -- Reasonable time gap
                  AND distance_km_from_prev IS NOT NULL
             THEN
@@ -86,21 +86,21 @@ track_calculations AS (
         END AS calculated_speed_knots,
         -- Course change calculation (handling 360° wraparound)
         CASE 
-            WHEN prev_reported_course_degrees IS NOT NULL AND reported_course_degrees IS NOT NULL 
+            WHEN prev_cog IS NOT NULL AND cog IS NOT NULL 
             THEN
                 LEAST(
-                    ABS(reported_course_degrees - prev_reported_course_degrees),
-                    360 - ABS(reported_course_degrees - prev_reported_course_degrees)
+                    ABS(cog - prev_cog),
+                    360 - ABS(cog - prev_cog)
                 )
             ELSE NULL
         END AS course_change_degrees,
         -- Speed consistency check
         CASE 
-            WHEN reported_speed_knots IS NOT NULL 
+            WHEN sog IS NOT NULL 
                  AND distance_km_from_prev IS NOT NULL
                  AND hours_since_prev_position > 0 AND hours_since_prev_position <= 24
             THEN
-                ABS(reported_speed_knots - ((distance_km_from_prev / hours_since_prev_position) * 0.539957))
+                ABS(sog - ((distance_km_from_prev / hours_since_prev_position) * 0.539957))
             ELSE NULL
         END AS speed_difference_knots
     FROM distance_calc
@@ -145,17 +145,17 @@ final_vessel_tracks AS (
         -- === VESSEL IDENTITY ===
         mmsi,
         vessel_name,
-        imo_number,
+        imo,
         vessel_type,
         -- === POSITION DATA ===
         position_timestamp,
-        latitude,
-        longitude,
-        position_point,
+        lat,
+        lon,
+        location_point,
         position_sequence,
         -- === REPORTED MOVEMENT ===
-        reported_speed_knots,
-        reported_course_degrees,
+        sog,
+        cog,
         heading,
         -- === CALCULATED MOVEMENT ===
         prev_position_timestamp,

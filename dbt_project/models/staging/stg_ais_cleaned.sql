@@ -1,7 +1,7 @@
 {{ config(
     materialized='table',
     indexes=[
-        {'columns': ['mmsi', 'basedatetime'], 'unique': True}
+        {'columns': ['mmsi', 'base_datetime'], 'unique': True}
     ]
 ) }}
 
@@ -133,7 +133,7 @@ final_cleaned AS (
     SELECT 
         -- Core identifiers (proper int8 and text handling)
         "MMSI"::bigint as mmsi,
-        "BaseDateTime"::timestamptz AT TIME ZONE 'UTC' as basedatetime,
+        "BaseDateTime"::timestamptz AT TIME ZONE 'UTC' as base_datetime,
         
         -- Spatial coordinates (float8 to decimal with proper precision)
         "LAT"::decimal(10,6) as lat,
@@ -163,12 +163,12 @@ final_cleaned AS (
             WHEN "VesselName" IS NOT NULL AND TRIM("VesselName") != '' 
             THEN LOWER(TRIM("VesselName"))
             ELSE NULL 
-        END as vesselname,
+        END as vessel_name,
         CASE 
             WHEN "CallSign" IS NOT NULL AND TRIM("CallSign") != '' 
             THEN UPPER(TRIM("CallSign"))  
             ELSE NULL 
-        END as callsign,
+        END as call_sign,
         CASE 
             WHEN "IMO" IS NOT NULL AND TRIM("IMO") != '' AND TRIM("IMO") ~ '^IMO\d{7}$'
             THEN TRIM("IMO")
@@ -178,7 +178,7 @@ final_cleaned AS (
             WHEN "VesselType" IS NOT NULL AND "VesselType" BETWEEN 0.0 AND 99.0 
             THEN "VesselType"::integer
             ELSE NULL 
-        END as vesseltype,
+        END as vessel_type,
         CASE 
             WHEN "Status" IS NOT NULL AND "Status" BETWEEN 0.0 AND 15.0 
             THEN "Status"::integer
@@ -210,7 +210,7 @@ final_cleaned AS (
             WHEN "TransceiverClass" IS NOT NULL AND TRIM("TransceiverClass") != '' 
             THEN TRIM("TransceiverClass")
             ELSE NULL 
-        END as transceiverclass,
+        END as transceiver_class,
         
         -- Convert flag_reason array to comma-separated string
         CASE 
@@ -229,4 +229,4 @@ final_cleaned AS (
 )
 
 SELECT * FROM final_cleaned
-ORDER BY mmsi, basedatetime
+ORDER BY mmsi, base_datetime
