@@ -123,6 +123,7 @@ services:
       DAGSTER_POSTGRES_PORT: 5432
       DAGSTER_POSTGRES_DB: deepdarshak_dev
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL: "${SLACK_CHANNEL}"
     volumes:
       - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
       - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml

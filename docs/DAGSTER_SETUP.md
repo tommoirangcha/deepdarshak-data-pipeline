@@ -36,6 +36,7 @@ You should see the Dagster interface with:
 - **Assets**: Your dbt models visualized as a graph
 - **Runs**: Execution history
 - **Schedules**: Daily dbt build schedule
+- **sensors** : Slack alerts
 
 ### 3. Run Your First Pipeline
 
@@ -49,25 +50,15 @@ Or use CLI:
 # Run all dbt models
 docker-compose exec dagster-user-code dagster asset materialize --select "*"
 
+# run ingestion.py 
+ docker compose exec dagster-user-code dagster asset materialize -m dagster_project.definitions --select raw_dump/raw_vessel_data
+
 # Run specific model
 # Dagster Setup and Quick Start (Combined)
 
 This single guide combines the Quick Start and Setup docs for running the DeepDarshak pipeline with Dagster + dbt in Docker.
 
-##  Architecture
-
 ```
-dagster_project/
-├── definitions.py              # Main Dagster entry point (export: defs)
-├── assets/
-│   ├── dbt_assets.py          # Auto-discovers dbt models and runs dbt build
-│   └── ingestion_assets.py    # CSV ingestion into Postgres
-├── resources/
-│   └── db_resource.py         # dbt CLI resource config
-└── schedules/
-    └── dbt_schedules.py       # Daily schedules (dbt + ingestion)
-```
-
 ##  Services and Config
 
 - Services (from `docker-compose.yml`):
@@ -81,43 +72,6 @@ dagster_project/
   - `workspace.yaml` – Points to the user code gRPC location
   - `dbt_project/` – dbt project (models, profiles, packages)
 
-##  Quick Start
-
-### 1) Build and start
-
-```powershell
-# From project root
-docker compose build --no-cache dagster-user-code dagster-webserver dagster-daemon; docker compose up -d db dagster-user-code dagster-webserver dagster-daemon
-
-# Check status
-docker compose ps
-```
-
-If your Docker uses the legacy syntax, replace `docker compose` with `docker-compose`.
-
-### 2) Open the UI
-
-Go to http://localhost:3001 and verify:
-- Assets tab shows your `deepdarshak_dbt_assets` and ingestion asset
-- Schedules tab lists daily schedules (enabled by default)
-
-### 3) Run your first pipeline
-
-In the UI:
-1. Open Assets
-2. Click “Materialize all”
-
-Or via CLI:
-```powershell
-docker compose exec dagster-user-code dagster asset materialize --select "*"
-```
-
-### 4) Optional: verify database connectivity
-
-```powershell
-docker compose exec db psql -U dev -d deepdarshak_dev -c "\dn"
-# You should see Dagster’s metadata schema and your project schemas.
-```
 
 ##  Asset Lineage (conceptual)
 
@@ -126,9 +80,7 @@ ingest_ais_csv (Python)
     ↓
 stg_ais_cleaned (dbt)
     ↓
-    ├── int_anomaly_detection (dbt)
-    │       ↓
-    │   detected_anomalies (dbt)
+    ├── int_anomaly_detection (dbt) ---> mart_detected_anomalies(dbt)
     │
     └── int_vessel_tracks (dbt)
 ```
@@ -162,25 +114,12 @@ docker compose logs -f dagster-user-code
 
 In the UI → Runs tab: view status, duration, logs, and materializations.
 
-## 🛠️ Development
-
-### Hot reload
-Code edits under `dagster_project/` are hot-reloaded by the user-code process. Refresh the UI to see updates.
-
-### Local (without Docker)
-```powershell
-$env:DB_HOST="localhost"; $env:DB_USER="dev"; $env:DB_PASS="dev"; $env:DB_NAME="deepdarshak_dev"; $env:DBT_PROFILES_DIR="C:\path\to\dbt_project"; $env:DBT_PROJECT_DIR="C:\path\to\dbt_project"
-dagster dev -m dagster_project.definitions
-```
 
 ##  Troubleshooting
 
 ```powershell
 # Rebuild and restart
-docker compose down -v; docker compose build --no-cache; docker compose up -d
-
-## Any code changes 
-docker compose restart dagster-user-code
+docker compose down ; docker compose build --no-cache; docker compose up -d
 
 # db health
 docker compose ps db
@@ -220,4 +159,4 @@ docker compose exec dagster-user-code dbt test
 - [ ] Assets visible and can be materialized
 - [ ] Schedules appear and run
 - [ ] Runs show success in UI
-##  Next Steps
+- [ ] Slack Alerts

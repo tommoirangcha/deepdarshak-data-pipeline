@@ -1,6 +1,7 @@
-# dbt Setup and Quick Start (DeepDarshak)
+```markdown
+# dbt — quick setup (DeepDarshak)
 
-This guide explains how to run and develop the dbt project used by the DeepDarshak pipeline, both inside Docker (recommended) and locally.
+This is a short, practical reference for running dbt in this repo. Use Docker (recommended) for parity with Dagster and CI.
 
 ##  Project layout
 
@@ -14,108 +15,38 @@ dbt_project/
 ├── seeds/                  # Seed CSVs (optional)
 ├── snapshots/              # Snapshots (optional)
 └── target/                 # Build artifacts (generated)
-```
 
-##  Profiles (connections)
+## Prereqs
+- Docker Compose (recommended) or dbt-core installed locally
+- A Postgres/PostGIS instance accessible with credentials referenced by `dbt_project/profiles.yml`
 
-`dbt_project/profiles.yml` is configured to read connection info from environment variables so it works in Docker and locally without edits:
+## Profiles / env vars
+- `dbt_project/profiles.yml` reads connection values from environment variables. Set: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` (and `DB_SCHEMA` if needed).
 
-- DB_HOST (default: localhost)
-- DB_PORT (default: 5432)
-- DB_USER (default: dev)
-- DB_PASS (default: dev)
-- DB_NAME (default: deepdarshak_dev)
+## Docker (recommended)
+- Start services: `docker compose up -d`
+- Install packages: `docker compose exec dagster-user-code dbt deps`
+- Build everything: `docker compose exec dagster-user-code dbt build`
+- Run a single model: `docker compose exec dagster-user-code dbt run --select <model>`
+- Run tests: `docker compose exec dagster-user-code dbt test`
 
-The default target is `dev` and uses schema `deepdarshak_staging`.
+## Local (quick)
+- PowerShell example to set env vars:
+  $env:DB_HOST='localhost'; $env:DB_PORT='5432'; $env:DB_USER='you'; $env:DB_PASS='pw'; $env:DB_NAME='deepdarshak_dev'
+- From repo root: `cd dbt_project` → `dbt deps` → `dbt build`
 
-##  Run dbt inside Docker (preferred)
+## Fast iteration tips
+- Use `--select` / `--exclude` and tags to limit runs (e.g. `dbt build --select tag:staging`).
+- Use `dbt parse` for quick diagnostics without running SQL.
+- Artifacts: `dbt_project/target/` (can be cleaned safely; they regenerate).
 
-The Dagster user-code container already mounts the dbt project and runs `dbt deps` at build time. Execute dbt via that container:
+## Troubleshooting
+- "Profiles not found": set `DBT_PROFILES_DIR` to the `dbt_project` path.
+- Missing packages: run `dbt deps` in the container or locally.
+- Permission/schema errors: ensure the DB user can create/use the target schema.
 
-```powershell
-# Build & start (if not running)
-docker compose up -d
-
-# Install/refresh packages
-docker compose exec dagster-user-code dbt deps
-
-# Parse project
-docker compose exec dagster-user-code dbt parse
-
-# Build all models (run + test)
-docker compose exec dagster-user-code dbt build
-
-# Run a specific model
-docker compose exec dagster-user-code dbt run --select int_vessel_tracks
-
-# Run tests only
-docker compose exec dagster-user-code dbt test
-```
-
-Notes:
-- Dagster assets also call `dbt build` via dagster-dbt; running dbt by hand is optional.
-- Artifacts will appear under `dbt_project/target/` (host-mounted, safe to delete; they regenerate).
-
-##  Develop and iterate
-
-- Edit models under `dbt_project/models/` and re-run `dbt build`.
-- Use `--select` and `--state` features for faster cycles, e.g.:
-
-```powershell
-# Only changed models (stateful runs)
-docker compose exec dagster-user-code dbt build --select state:modified+ --defer --state ./dbt_project/target
-```
-
-##  Run dbt locally (without Docker)
-
-Ensure Python/dbt are installed locally and set env vars to match your database:
-
-```powershell
-$env:DB_HOST="localhost"; $env:DB_PORT="5432"; $env:DB_USER="dev"; $env:DB_PASS="dev"; $env:DB_NAME="deepdarshak_dev"
-$env:DBT_PROFILES_DIR=(Resolve-Path "dbt_project").Path
-$env:DBT_PROJECT_DIR=(Resolve-Path "dbt_project").Path
-
-# From repo root
-cd dbt_project
-
-# Install packages
-dbt deps
-
-# Build project
-dbt build
-```
-
-Tip: If you changed `profiles.yml` location, set `DBT_PROFILES_DIR` accordingly.
-
-##  Common commands
-
-```powershell
-# Clean artifacts
-docker compose exec dagster-user-code dbt clean
-
-# Full build (models + tests)
-docker compose exec dagster-user-code dbt build
-
-# Run just models
-docker compose exec dagster-user-code dbt run --select tag:staging
-
-# Run tests only
-docker compose exec dagster-user-code dbt test --select state:modified
-
-# Show docs (if configured)
-# docker compose exec dagster-user-code dbt docs generate
-# docker compose exec dagster-user-code dbt docs serve -p 8081
-```
-
-##  Troubleshooting
-
-- Packages missing: run `dbt deps` inside the user-code container.
-- Profiles not found: ensure `DBT_PROFILES_DIR=/app/dbt_project` in containers or point `DBT_PROFILES_DIR` locally.
-- Permission errors on schemas: verify that the `dev` user can create/use the target schema (`deepdarshak_staging`).
-- Missing tables: run the ingestion asset first or ensure source data exists.
-
-## 🔗 Related
-
-- Dagster guide: `docs/DAGSTER_SETUP.md`
-- dagster-dbt docs: https://docs.dagster.io/integrations/dbt
+## Related
+- Dagster integration:[DAGSTER_SETUP.md](DAGSTER_SETUP.md)
 - dbt docs: https://docs.getdbt.com/
+
+```
