@@ -4,19 +4,19 @@ from sqlalchemy import text
 LATEST_VESSEL_SUMMARY = text(
     """
     SELECT mmsi,
-           vesselname,
+           vessel_name,
            imo,
-           callsign,
-           vesseltype,
+           call_sign,
+           vessel_type,
            length,
            width,
            draft,
            cargo,
-           transceiverclass,
-           basedatetime AS last_seen
+           transceiver_class,
+           base_datetime AS last_seen
     FROM deepdarshak_staging.stg_ais_cleaned
     WHERE mmsi = :mmsi
-    ORDER BY basedatetime DESC
+    ORDER BY base_datetime DESC
     LIMIT 1
     """
 )
@@ -24,15 +24,15 @@ LATEST_VESSEL_SUMMARY = text(
 LATEST_POSITION = text(
     """
     SELECT mmsi,
-           basedatetime AS timestamp,
+           position_timestamp AS timestamp,
            lat,
            lon,
            sog,
            cog,
            heading
-    FROM deepdarshak_staging.stg_ais_cleaned
+    FROM deepdarshak_staging.int_vessel_tracks
     WHERE mmsi = :mmsi
-    ORDER BY basedatetime DESC
+    ORDER BY position_timestamp DESC
     LIMIT 1
     """
 )
@@ -42,8 +42,8 @@ LIST_ANOMALIES = text(
     SELECT *
     FROM deepdarshak_staging.mart_detected_anomalies
     WHERE mmsi = :mmsi
-      AND (:since IS NULL OR event_time >= :since)
-        ORDER BY event_time DESC, created_at DESC
+      AND (:since IS NULL OR position_timestamp >= :since)
+        ORDER BY position_timestamp DESC, created_at DESC
     LIMIT :limit
     """
 )
@@ -51,7 +51,7 @@ LIST_ANOMALIES = text(
 POSITIONS_QUERY = text(
         """
         SELECT mmsi,
-                     basedatetime AS timestamp,
+                     base_datetime AS timestamp,
                      lat,
                      lon,
                      sog,
@@ -59,9 +59,9 @@ POSITIONS_QUERY = text(
                      heading
         FROM deepdarshak_staging.stg_ais_cleaned
         WHERE mmsi = :mmsi
-            AND (:start IS NULL OR basedatetime >= :start)
-            AND (:end IS NULL OR basedatetime <= :end)
-        ORDER BY basedatetime ASC
+            AND (:start IS NULL OR base_datetime >= :start)
+            AND (:end IS NULL OR base_datetime <= :end)
+        ORDER BY base_datetime ASC
         LIMIT :limit
         """
 )

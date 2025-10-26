@@ -55,22 +55,22 @@ Key models (see `dbt_project/models/schema.yml`):
 
 - Latest vessel summary
   ```powershell
-  curl -H "X-API-Key: deepdarshak_ais_2025" http://localhost:8080/vessels/205460000
+  curl.exe -H "X-API-Key: deepdarshak_ais_2025" http://localhost:8080/vessels/205460000
   ```
 
 - Latest position
   ```powershell
-  curl -H "X-API-Key: deepdarshak_ais_2025" http://localhost:8080/vessels/205460000/position
+  curl.exe -H "X-API-Key: deepdarshak_ais_2025" http://localhost:8080/vessels/205460000/position
   ```
 
 - Positions as GeoJSON (with optional time window)
   ```powershell
-  curl -H "X-API-Key: deepdarshak_ais_2025" "http://localhost:8080/vessels/205460000/positions?start=2020-01-01 00:00:09.000Z&end=2020-01-01 00:00:09.000Z&max_points=500"
+  curl.exe -H "X-API-Key: deepdarshak_ais_2025" "http://localhost:8080/vessels/205460000/positions?start=2020-01-01 00:00:09.000Z&end=2020-01-01 00:00:09.000Z&max_points=500"
   ```
 
 - List anomalies (limit and since)
   ```powershell
-  curl -H "X-API-Key: deepdarshak_ais_2025" "http://localhost:8080/vessels/316005613/anomalies?limit=50&since=2020-01-01T00:01:12Z"
+  curl.exe -H "X-API-Key: deepdarshak_ais_2025" "http://localhost:8080/vessels/316005613/anomalies?limit=50&since=2020-01-01T00:01:12Z"
   ```
 
 Sample anomaly response (see `docs/samples/anomalies_response.json`):

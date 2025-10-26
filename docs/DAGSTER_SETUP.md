@@ -179,6 +179,9 @@ dagster dev -m dagster_project.definitions
 # Rebuild and restart
 docker compose down -v; docker compose build --no-cache; docker compose up -d
 
+## Any code changes 
+docker compose restart dagster-user-code
+
 # db health
 docker compose ps db
 docker compose exec db psql -U dev -d deepdarshak_dev -c "SELECT 1;"

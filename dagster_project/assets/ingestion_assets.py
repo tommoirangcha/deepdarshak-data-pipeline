@@ -32,9 +32,9 @@ def ingest_ais_csv(context: AssetExecutionContext) -> Output:
     SCHEMA_NAME = "deepdarshak_raw_dump"
     
     # Database connection from environment
-    db_user = os.getenv("DB_USER", "dev")
-    db_pass = os.getenv("DB_PASS", "dev")
-    db_host = os.getenv("DB_HOST", "localhost")
+    db_user = os.getenv("DB_USER")
+    db_pass = os.getenv("DB_PASS")
+    db_host = os.getenv("DB_HOST")
     db_port = os.getenv("DB_PORT", "5432")
     db_name = os.getenv("DB_NAME", "deepdarshak_dev")
     
