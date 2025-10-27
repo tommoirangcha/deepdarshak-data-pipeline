@@ -24,7 +24,7 @@ all_assets = [
 # Define resources
 resources = {
     "dbt": get_dbt_resource(),
-    "slack": get_slack_resource(),
+    #"slack": get_slack_resource(),
 }
 
 # Define schedules
