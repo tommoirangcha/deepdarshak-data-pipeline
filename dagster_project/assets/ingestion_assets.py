@@ -21,8 +21,8 @@ def ingest_ais_csv(context: AssetExecutionContext) -> Output:
     """Loads AIS CSV data from data/ folder into PostgreSQL in chunks.""" 
 
     # Configuration
-    CSV_PATH = Path(os.getenv("PROJECT_ROOT", "/app")) / "data" / "ais_5000.csv"
-    CHUNK_SIZE = 200
+    CSV_PATH = Path(os.getenv("PROJECT_ROOT", "/app")) / "data" / "ais_100k.csv"
+    CHUNK_SIZE = 5000
     TABLE_NAME = "raw_vessel_data"
     SCHEMA_NAME = "deepdarshak_raw_dump"
     

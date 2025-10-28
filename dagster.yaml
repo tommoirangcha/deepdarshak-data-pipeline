@@ -4,10 +4,10 @@
 storage:
   postgres:
     postgres_db:
-      username: { env: "DAGSTER_POSTGRES_USER" }
-      password: { env: "DAGSTER_POSTGRES_PASSWORD" }
-      hostname: { env: "DAGSTER_POSTGRES_HOST" }
-      db_name: { env: "DAGSTER_POSTGRES_DB" }
+      username: dev 
+      password: dev
+      hostname: db
+      db_name: deepdarshak_dev
       port: 5432
 
 run_coordinator:
