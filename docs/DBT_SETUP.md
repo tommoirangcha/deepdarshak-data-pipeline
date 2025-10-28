@@ -49,4 +49,7 @@ dbt_project/
 - Dagster integration:[DAGSTER_SETUP.md](DAGSTER_SETUP.md)
 - dbt docs: https://docs.getdbt.com/
 
+### Resources:
+- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
+
 ```

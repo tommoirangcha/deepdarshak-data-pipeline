@@ -24,8 +24,6 @@ WITH validated_positions AS (
     SELECT *
     FROM {{ ref('stg_ais_cleaned') }}
     WHERE 
-        -- Rely on stg_ais_cleaned for type/range/null validations.
-        -- Only enforce business rule to exclude flagged rows here.
         (flag_reason = '' OR flag_reason IS NULL)
         -- Future: Uncomment for incremental materialization
         -- {% if is_incremental() %}
@@ -81,7 +79,7 @@ track_calculations AS (
                  AND hours_since_prev_position > 0 AND hours_since_prev_position <= 24  -- Reasonable time gap
                  AND distance_km_from_prev IS NOT NULL
             THEN
-                (distance_km_from_prev / hours_since_prev_position) * 0.539957  -- km/h to knots
+                (distance_km_from_prev / hours_since_prev_position) * 0.539957  -- km/h to knots (1knot = 1.852 km/h)
             ELSE NULL
         END AS calculated_speed_knots,
         -- Course change calculation (handling 360° wraparound)

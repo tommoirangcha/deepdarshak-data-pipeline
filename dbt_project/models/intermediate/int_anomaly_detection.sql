@@ -2,11 +2,6 @@
 --   1) high_speed: SOG > 60 knots
 --   2) cog_jump:  > 90° change within 5 minutes per MMSI
 --   3) duplicate_mmsi_timestamp: multiple rows share (mmsi, base_datetime)
--- Output columns: mmsi, position_timestamp, anomaly_type, details (jsonb), created_at
--- Notes:
---   - position_timestamp uses base_datetime exactly as produced by stg_ais_cleaned
---   - COG math uses numeric to match stg_ais_cleaned.cog (decimal(5,2))
---   - Index helps typical lookups by (mmsi, position_timestamp)
 {{ config(
     materialized='table',
     indexes=[
