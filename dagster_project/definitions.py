@@ -7,7 +7,6 @@ from dagster import Definitions
 from .assets.dbt_assets import deepdarshak_dbt_assets
 from .assets.ingestion_assets import ingest_ais_csv
 from .resources.db_resource import get_dbt_resource
-from .resources.slack_resource import get_slack_resource
 from .schedules.dbt_schedules import daily_dbt_schedule, ingestion_schedule
 from .sensors.slack_sensors import (
     slack_pipeline_success_sensor,
@@ -24,7 +23,6 @@ all_assets = [
 # Define resources
 resources = {
     "dbt": get_dbt_resource(),
-    #"slack": get_slack_resource(),
 }
 
 # Define schedules

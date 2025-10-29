@@ -1,8 +1,10 @@
 # Dagster Integration for DeepDarshak
 
-This document explains how to use Dagster orchestration for the DeepDarshak maritime data pipeline.
+This document explains Dagster orchestration for the DeepDarshak maritime data pipeline. For Docker Compose setup, environment variables, and troubleshooting, see the main [DOCKER_FILE.md](DOCKER_FILE.md) guide.
 
-##  Architecture
+---
+
+## Architecture
 
 ```
 dagster_project/
@@ -16,64 +18,50 @@ dagster_project/
     └── dbt_schedules.py    # Daily 2 AM UTC schedule
 ```
 
+## Key Dagster files (quick reference)
+
+Below are the main Dagster files and a short explanation of their role in the repository.
+
+- `dagster_project/definitions.py` — Dagster entry point that registers the repository's job/asset definitions and exposes the `defs` that the Dagster gRPC server loads.
+
+- `dagster_project/assets/dbt_assets.py` — Auto-discovers or defines dbt-backed assets. Maps dbt models to Dagster assets so dbt models can be materialized from Dagster runs.
+
+- `dagster_project/assets/ingestion_assets.py` — Contains Python assets for ingestion (for example, reading CSVs from `data/` and materializing raw tables into the DB). This is where ingestion logic and small ETL scripts live.
+
+- `dagster_project/resources/db_resource.py` — Database resource helper (connection creation and lifecycle management) used by assets and ops.
+
+- `dagster_project/schedules/dbt_schedules.py` — Schedules for running dbt jobs (e.g., daily_dbt_builds). Connected to the Dagster daemon.
+
+- `dagster_project/sensors/slack_sensors.py` — Sensors that watch for events (or failed runs) and send Slack alerts.
+
+---
+
 ## 🚀 Quick Start
 
-### 1. Start All Services
+1. Start all services (see [DOCKER_FILE.md](DOCKER_FILE.md) for details).
+2. Access Dagster UI at: **http://localhost:3001**
+3. In the UI, go to **Assets** and click **"Materialize all"** to run the pipeline.
+4. Or use CLI (inside the container):
+   - `docker compose exec dagster-user-code dagster asset materialize --select "*"`
+   - `docker compose exec dagster-user-code dagster asset materialize -m dagster_project.definitions --select raw_dump/raw_vessel_data`
 
-```powershell
-# Build and start database + Dagster services
-docker-compose up -d
+---
 
-# Check service status
-docker-compose ps
-```
-
-### 2. Access Dagster UI
-
-Open your browser to: **http://localhost:3001**
-
-You should see the Dagster interface with:
-- **Assets**: Your dbt models visualized as a graph
-- **Runs**: Execution history
-- **Schedules**: Daily dbt build schedule
-- **sensors** : Slack alerts
-
-### 3. Run Your First Pipeline
-
-In the Dagster UI:
-1. Navigate to **Assets** tab
-2. Click **"Materialize all"** button
-3. Watch the pipeline execute in real-time
-
-Or use CLI:
-```powershell
-# Run all dbt models
-docker-compose exec dagster-user-code dagster asset materialize --select "*"
-
-# run ingestion.py 
- docker compose exec dagster-user-code dagster asset materialize -m dagster_project.definitions --select raw_dump/raw_vessel_data
-
-# Run specific model
-# Dagster Setup and Quick Start (Combined)
-
-This single guide combines the Quick Start and Setup docs for running the DeepDarshak pipeline with Dagster + dbt in Docker.
-
-```
-##  Services and Config
+## Services and Config
 
 - Services (from `docker-compose.yml`):
   - db (PostgreSQL + PostGIS)
   - dagster-user-code (gRPC, serves your assets) on 4000
   - dagster-webserver (UI) on 3001
   - dagster-daemon (schedules/sensors)
-
 - Key config files:
   - `dagster.yaml` – Dagster instance (storage, logs)
   - `workspace.yaml` – Points to the user code gRPC location
   - `dbt_project/` – dbt project (models, profiles, packages)
 
+---
 
-##  Asset Lineage (conceptual)
+## Asset Lineage (conceptual)
 
 ```
 ingest_ais_csv (Python)
@@ -85,72 +73,47 @@ stg_ais_cleaned (dbt)
     └── int_vessel_tracks (dbt)
 ```
 
+---
+
 ## ⏰ Schedules
 
 - Daily dbt build (2:00 AM UTC)
-- Daily ingestion (12:00 AM UTC)
+- Daily ingestion (6:00 AM and 9:00 PM IST)
 
 Manage in UI (Schedules tab) or via CLI, e.g.:
-```powershell
-# Stop a schedule
-docker compose exec dagster-webserver dagster schedule stop daily_dbt_build
+- `docker compose exec dagster-webserver dagster schedule stop daily_dbt_build`
+- `docker compose exec dagster-webserver dagster schedule trigger daily_dbt_build`
 
-# Trigger once
-docker compose exec dagster-webserver dagster schedule trigger daily_dbt_build
-```
+---
 
-##  Monitoring
+## Monitoring
 
-```powershell
-# Web UI logs
-docker compose logs -f dagster-webserver
+- Web UI logs: `docker compose logs -f dagster-webserver`
+- Daemon (schedules/sensors): `docker compose logs -f dagster-daemon`
+- User code (asset execution): `docker compose logs -f dagster-user-code`
+- In the UI → Runs tab: view status, duration, logs, and materializations.
 
-# Daemon (schedules/sensors)
-docker compose logs -f dagster-daemon
+---
 
-# User code (asset execution)
-docker compose logs -f dagster-user-code
-```
+## Troubleshooting
 
-In the UI → Runs tab: view status, duration, logs, and materializations.
+- For Docker Compose and environment troubleshooting, see [DOCKER_FILE.md](DOCKER_FILE.md).
+- To rebuild and restart: `docker compose down ; docker compose build --no-cache; docker compose up -d`
+- To check DB health: `docker compose ps db` and `docker compose exec db psql -U dev -d deepdarshak_dev -c "SELECT 1;"`
+- If dbt assets not visible: `docker compose restart dagster-user-code`
+
+---
+
+## Common commands
+
+- Start/stop: `docker compose up -d` / `docker compose down`
+- Tail logs: `docker compose logs -f dagster-webserver`
+- Run dbt models: `docker compose exec dagster-user-code dbt build`
+- Run a specific model: `docker compose exec dagster-user-code dbt run --select int_vessel_tracks`
+- Run tests: `docker compose exec dagster-user-code dbt test`
 
 
-##  Troubleshooting
-
-```powershell
-# Rebuild and restart
-docker compose down ; docker compose build --no-cache; docker compose up -d
-
-# db health
-docker compose ps db
-docker compose exec db psql -U dev -d deepdarshak_dev -c "SELECT 1;"
-
-# dbt assets not visible
-docker compose restart dagster-user-code
-```
-
-##  Common commands
-
-```powershell
-# Start/stop
-docker compose up -d
-docker compose down
-
-# Tail logs for a service
-docker compose logs -f dagster-webserver
-
-# Run dbt models directly inside user-code container
-docker compose exec dagster-user-code dbt build
-docker compose exec dagster-user-code dbt run --select int_vessel_tracks
-docker compose exec dagster-user-code dbt test
-```
-
-## 📚 Resources
-
-- Dagster docs: https://docs.dagster.io/
-- dagster-dbt integration: https://docs.dagster.io/integrations/dbt
-- Assets: https://docs.dagster.io/concepts/assets/software-defined-assets
-- Schedules & sensors: https://docs.dagster.io/concepts/partitions-schedules-sensors/schedules
+---
 
 ## ✅ Success checklist
 
@@ -160,3 +123,12 @@ docker compose exec dagster-user-code dbt test
 - [ ] Schedules appear and run
 - [ ] Runs show success in UI
 - [ ] Slack Alerts
+
+---
+
+## 📚 Resources
+
+- Dagster docs: https://docs.dagster.io/
+- dagster-dbt integration: https://docs.dagster.io/integrations/dbt
+- Assets: https://docs.dagster.io/concepts/assets/software-defined-assets
+- Schedules & sensors: https://docs.dagster.io/concepts/partitions-schedules-sensors/schedules

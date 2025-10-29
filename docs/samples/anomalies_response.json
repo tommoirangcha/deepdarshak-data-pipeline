@@ -1,15 +1,558 @@
 {
-  "mmsi": 316005613,
-  "items": [
+  "data": [
     {
-      "event_time": "2020-01-01T00:01:12",
+      "mmsi": 367780670,
+      "position_timestamp": "2020-01-01T00:03:44",
       "anomaly_type": "cog_jump",
       "details": {
-        "diff": 102.7,
-        "cur_cog": 172.5,
-        "prev_cog": 69.8
-      }
+        "diff": 100.5,
+        "cur_cog": 337,
+        "prev_cog": 77.5
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367471080,
+      "position_timestamp": "2020-01-01T00:03:44",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 121.3,
+        "cur_cog": 107.5,
+        "prev_cog": 228.8
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367021240,
+      "position_timestamp": "2020-01-01T00:03:43",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 146,
+        "cur_cog": 115,
+        "prev_cog": 261
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367174390,
+      "position_timestamp": "2020-01-01T00:03:43",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 95.9,
+        "cur_cog": 103.5,
+        "prev_cog": 199.4
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367306520,
+      "position_timestamp": "2020-01-01T00:03:42",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 178.8,
+        "cur_cog": 43.9,
+        "prev_cog": 225.1
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 316006922,
+      "position_timestamp": "2020-01-01T00:03:42",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 149.4,
+        "cur_cog": 56.4,
+        "prev_cog": 205.8
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367555670,
+      "position_timestamp": "2020-01-01T00:03:41",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 169.7,
+        "cur_cog": 209.4,
+        "prev_cog": 19.1
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367685470,
+      "position_timestamp": "2020-01-01T00:03:41",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 171.8,
+        "cur_cog": 351.2,
+        "prev_cog": 163
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367578810,
+      "position_timestamp": "2020-01-01T00:03:40",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 155.7,
+        "cur_cog": 204.3,
+        "prev_cog": 360
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367586750,
+      "position_timestamp": "2020-01-01T00:03:39",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 152.1,
+        "cur_cog": 271.2,
+        "prev_cog": 119.1
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 365824084,
+      "position_timestamp": "2020-01-01T00:03:39",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 120.9,
+        "cur_cog": 194.1,
+        "prev_cog": 315
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367536590,
+      "position_timestamp": "2020-01-01T00:03:38",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 112,
+        "cur_cog": 346.9,
+        "prev_cog": 234.9
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367634660,
+      "position_timestamp": "2020-01-01T00:03:38",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 139.7,
+        "cur_cog": 206.8,
+        "prev_cog": 67.1
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 339904000,
+      "position_timestamp": "2020-01-01T00:03:38",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 160.7,
+        "cur_cog": 260.8,
+        "prev_cog": 61.5
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 369994000,
+      "position_timestamp": "2020-01-01T00:03:38",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 163.7,
+        "cur_cog": 208.2,
+        "prev_cog": 11.9
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367581140,
+      "position_timestamp": "2020-01-01T00:03:38",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 143.4,
+        "cur_cog": 345.2,
+        "prev_cog": 201.8
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367509760,
+      "position_timestamp": "2020-01-01T00:03:37",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 95.4,
+        "cur_cog": 95.4,
+        "prev_cog": 0
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367003980,
+      "position_timestamp": "2020-01-01T00:03:37",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 149.2,
+        "cur_cog": 25.5,
+        "prev_cog": 174.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 366948350,
+      "position_timestamp": "2020-01-01T00:03:37",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 109.2,
+        "cur_cog": 197.7,
+        "prev_cog": 306.9
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 366996190,
+      "position_timestamp": "2020-01-01T00:03:37",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 125.3,
+        "cur_cog": 37,
+        "prev_cog": 271.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367585170,
+      "position_timestamp": "2020-01-01T00:03:37",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 114.8,
+        "cur_cog": 94.5,
+        "prev_cog": 339.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367621000,
+      "position_timestamp": "2020-01-01T00:03:36",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 137.2,
+        "cur_cog": 79.2,
+        "prev_cog": 302
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367057260,
+      "position_timestamp": "2020-01-01T00:03:36",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 99.6,
+        "cur_cog": 131.8,
+        "prev_cog": 231.4
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 338224000,
+      "position_timestamp": "2020-01-01T00:03:35",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 174.8,
+        "cur_cog": 63.2,
+        "prev_cog": 238
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367356010,
+      "position_timestamp": "2020-01-01T00:03:35",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 166.7,
+        "cur_cog": 193.3,
+        "prev_cog": 0
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 368103550,
+      "position_timestamp": "2020-01-01T00:03:35",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 150.6,
+        "cur_cog": 55.3,
+        "prev_cog": 264.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 366841020,
+      "position_timestamp": "2020-01-01T00:03:34",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 147,
+        "cur_cog": 43.8,
+        "prev_cog": 256.8
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367673560,
+      "position_timestamp": "2020-01-01T00:03:34",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 98,
+        "cur_cog": 82.3,
+        "prev_cog": 180.3
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367495480,
+      "position_timestamp": "2020-01-01T00:03:34",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 173,
+        "cur_cog": 52.3,
+        "prev_cog": 239.3
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 316006563,
+      "position_timestamp": "2020-01-01T00:03:34",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 105.9,
+        "cur_cog": 64.4,
+        "prev_cog": 170.3
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 366831930,
+      "position_timestamp": "2020-01-01T00:03:33",
+      "anomaly_type": "high_speed",
+      "details": {
+        "sog": 102.3
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367504950,
+      "position_timestamp": "2020-01-01T00:03:33",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 164.4,
+        "cur_cog": 243.3,
+        "prev_cog": 47.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367702130,
+      "position_timestamp": "2020-01-01T00:03:33",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 136.7,
+        "cur_cog": 94.5,
+        "prev_cog": 231.2
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367469370,
+      "position_timestamp": "2020-01-01T00:03:33",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 169,
+        "cur_cog": 169,
+        "prev_cog": 0
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367379670,
+      "position_timestamp": "2020-01-01T00:03:32",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 104.5,
+        "cur_cog": 165.5,
+        "prev_cog": 270
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367561460,
+      "position_timestamp": "2020-01-01T00:03:31",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 159.4,
+        "cur_cog": 218.6,
+        "prev_cog": 18
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367675660,
+      "position_timestamp": "2020-01-01T00:03:31",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 114.9,
+        "cur_cog": 272,
+        "prev_cog": 157.1
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367689990,
+      "position_timestamp": "2020-01-01T00:03:30",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 162.8,
+        "cur_cog": 321.9,
+        "prev_cog": 124.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 316018851,
+      "position_timestamp": "2020-01-01T00:03:30",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 167,
+        "cur_cog": 123,
+        "prev_cog": 316
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367373970,
+      "position_timestamp": "2020-01-01T00:03:30",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 92.4,
+        "cur_cog": 267.6,
+        "prev_cog": 360
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367430210,
+      "position_timestamp": "2020-01-01T00:03:29",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 116.2,
+        "cur_cog": 51.9,
+        "prev_cog": 168.1
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367702510,
+      "position_timestamp": "2020-01-01T00:03:29",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 102.2,
+        "cur_cog": 281.7,
+        "prev_cog": 179.5
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367377380,
+      "position_timestamp": "2020-01-01T00:03:29",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 102,
+        "cur_cog": 246.4,
+        "prev_cog": 348.4
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 368108120,
+      "position_timestamp": "2020-01-01T00:03:28",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 171.9,
+        "cur_cog": 60.8,
+        "prev_cog": 232.7
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367642910,
+      "position_timestamp": "2020-01-01T00:03:28",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 141.7,
+        "cur_cog": 12.7,
+        "prev_cog": 154.4
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 339365000,
+      "position_timestamp": "2020-01-01T00:03:28",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 143.4,
+        "cur_cog": 212.4,
+        "prev_cog": 69
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 338822000,
+      "position_timestamp": "2020-01-01T00:03:28",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 148.5,
+        "cur_cog": 187,
+        "prev_cog": 335.5
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367396710,
+      "position_timestamp": "2020-01-01T00:03:25",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 127.8,
+        "cur_cog": 196.4,
+        "prev_cog": 68.6
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367747610,
+      "position_timestamp": "2020-01-01T00:03:25",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 177,
+        "cur_cog": 108.2,
+        "prev_cog": 285.2
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
+    },
+    {
+      "mmsi": 367615770,
+      "position_timestamp": "2020-01-01T00:03:25",
+      "anomaly_type": "cog_jump",
+      "details": {
+        "diff": 147.2,
+        "cur_cog": 347.6,
+        "prev_cog": 134.8
+      },
+      "created_at": "2025-10-29T06:46:46.812027Z"
     }
   ],
-  "count": 1
+  "meta": {
+    "count": 50,
+    "limit": 50,
+    "page": 1,
+    "total": 612
+  }
 }

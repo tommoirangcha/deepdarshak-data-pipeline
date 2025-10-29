@@ -1,27 +1,15 @@
 """
-Slack resource configuration for Dagster notifications.
+DEPRECATED: Slack resource removed
+
+This file previously provided a Dagster Slack resource. The project now
+uses `dagster_project/sensors/slack_sensors.py` which instantiates the
+`slack_sdk.WebClient` directly. The original resource implementation was
+removed to avoid duplication. The file remains as a deprecation marker so
+that older checkouts or references do not fail unexpectedly.
+
+If you want a Dagster-managed Slack resource, reintroduce a resource
+factory that returns a `dagster_slack.SlackResource` and register it in
+`dagster_project/definitions.py`.
 """
-import os
-from dagster_slack import SlackResource
 
-
-def get_slack_resource() -> SlackResource:
-    """
-    Initialize and return Slack resource with bot token from environment.
-    
-    Returns:
-        SlackResource: Configured Slack resource for sending notifications
-    """
-    slack_token = os.getenv("SLACK_BOT_TOKEN")
-    
-    if not slack_token:
-        raise ValueError(
-            "SLACK_BOT_TOKEN environment variable is not set. "
-            "Please add it to your .env file or environment."
-        )
-    
-    return SlackResource(token=slack_token)
-
-
-# Slack channel for pipeline alerts
-SLACK_CHANNEL = "#deepdarshak_ais-pipeline-alerts"
+# No functional code here — resource was intentionally removed.
