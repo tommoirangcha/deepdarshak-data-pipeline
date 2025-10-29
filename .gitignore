@@ -1,6 +1,6 @@
 # Large data files
 data/AIS_2020_01_01.csv
-*.csv
+# *.csv
 
 # Python
 __pycache__/
