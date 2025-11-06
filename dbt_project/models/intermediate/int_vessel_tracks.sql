@@ -86,10 +86,7 @@ track_calculations AS (
         CASE 
             WHEN prev_cog IS NOT NULL AND cog IS NOT NULL 
             THEN
-                LEAST(
-                    ABS(cog - prev_cog),
-                    360 - ABS(cog - prev_cog)
-                )
+                LEAST(ABS(cog - prev_cog), 360 - ABS(cog - prev_cog))
             ELSE NULL
         END AS course_change_degrees,
         -- Speed consistency check

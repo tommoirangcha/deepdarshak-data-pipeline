@@ -29,6 +29,3 @@ local_artifact_storage:
   class: LocalArtifactStorage
   config:
     base_dir: /opt/dagster/storage
-
-telemetry:
-  enabled: false

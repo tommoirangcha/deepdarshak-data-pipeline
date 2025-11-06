@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
-from sqlalchemy.engine import Row
 from ..core.deps import require_api_key
 from ..db.session import db_conn
 from ..db.queries import LATEST_VESSEL_SUMMARY, LATEST_POSITION, LIST_ANOMALIES, COUNT_ANOMALIES
